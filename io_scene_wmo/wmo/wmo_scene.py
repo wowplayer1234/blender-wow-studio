@@ -514,7 +514,23 @@ class BlenderWMOScene:
             doodads = []
 
             for doodad in doodad_set_collection.objects:
-                group = find_nearest_object(doodad, group_objects)
+                # DARKCRAFT W0.2: a doodad may DECLARE the group that renders it
+                # (custom property 'darkcraft_group' = the group object's name).
+                # The declaration wins over nearest-mesh; a name that matches no
+                # exported group is an error, not a fallback to the guess.
+                explicit = doodad.get('darkcraft_group')
+                if explicit:
+                    group = None
+                    for cand in group_objects:
+                        if cand.name == explicit:
+                            group = cand
+                            break
+                    if group is None:
+                        raise ReferenceError(
+                            "Doodad '{}' declares darkcraft_group '{}' which is not an "
+                            "exported group object".format(doodad.name, explicit))
+                else:
+                    group = find_nearest_object(doodad, group_objects)
                 if group not in self.doodads_relations:
                     print("ERROR doodad group ref, nearest_object: " + group.name)
                 self.doodads_relations[group].append(doodad_counter)
