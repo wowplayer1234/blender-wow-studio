@@ -729,7 +729,10 @@ RGBA VertexColorLayer::operator[](std::size_t index) const
   if (std::holds_alternative<MLoopCol*>(_color_layer))
   {
     MLoopCol* col = &std::get<MLoopCol*>(_color_layer)[index];
-    return RGBA{col->r, col->g, col->b, 0xFF};
+    // Darkcraft D3b: return the layer's own alpha. With 0xFF forced here, comp_color_key
+    // (r||g||b||a) was true for every vertex of a BatchmapTrans/BatchmapInt layer, so a
+    // batch map marked EVERY face - all-transition groups, whose doodads the client hides.
+    return RGBA{col->r, col->g, col->b, col->a};
   }
   else
   {
@@ -737,6 +740,6 @@ RGBA VertexColorLayer::operator[](std::size_t index) const
     return linear_to_SRGB({static_cast<unsigned char>(col->color[0] * 255.f)
                           , static_cast<unsigned char>(col->color[1] * 255.f)
                           , static_cast<unsigned char>(col->color[2] * 255.f)
-                          , 0xFF});
+                          , static_cast<unsigned char>(col->color[3] * 255.f)});   // Darkcraft D3b: real alpha
   }
 }
