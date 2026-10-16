@@ -140,6 +140,7 @@ WMOGeometryBatcher::WMOGeometryBatcher(std::uintptr_t mesh_ptr
     {
       _create_new_batch(_material_ids[_get_poly_material_index(looptri->poly)],
                         batch_type, cur_batch, cur_batch_mat_id, cur_batch_type);
+      _cur_batch_slot = _get_poly_material_index(looptri->poly);
     }
     
     _create_new_render_triangle(looptri, cur_batch);
@@ -388,7 +389,8 @@ bool WMOGeometryBatcher::_needs_new_batch(MOBABatch* cur_batch
     , std::uint16_t cur_batch_mat_id)
 {
   return !cur_batch || cur_batch_type != cur_poly_batch_type
-    || _material_ids[_get_poly_material_index(cur_tri->poly)] != cur_batch_mat_id;
+    || _material_ids[_get_poly_material_index(cur_tri->poly)] != cur_batch_mat_id
+    || _get_poly_material_index(cur_tri->poly) != _cur_batch_slot;
 }
 
 unsigned char WMOGeometryBatcher::_get_grayscale_factor(RGBA const& color)

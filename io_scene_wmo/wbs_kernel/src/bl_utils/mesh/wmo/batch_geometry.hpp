@@ -296,6 +296,11 @@ namespace wbs_kernel::bl_utils::mesh::wmo
     math_utils::Vector3D _bounding_box_min;
     math_utils::Vector3D _bounding_box_max;
 
+    // Darkcraft (second MOMT repack, 2026-10-15): the Blender material SLOT the current batch was opened for. A batch
+    // ends where the slot changes, not only where the root MOMT row changes, so two slots sharing one row (a row
+    // shared at the root, an over-full row split by the generator) stay two batches on that row.
+    std::int32_t _cur_batch_slot = -1;
+
     std::unordered_map<unsigned, std::vector<BatchVertexInfo>> _cur_batch_vertex_map;
     std::unordered_map<unsigned, unsigned> _collision_vertex_map;
     std::vector<int> const& _material_ids;
